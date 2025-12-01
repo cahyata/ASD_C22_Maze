@@ -10,7 +10,7 @@ import javax.swing.Timer;
 
 public class MazeGame extends JFrame {
 
-    // --- COLORS (Modern Apple/Clean Palette) ---
+    // --- COLORS ---
     public static final Color APP_BG = new Color(250, 250, 252);
     public static final Color SIDEBAR_BG = Color.WHITE;
     public static final Color PRIMARY_BLUE = new Color(0, 122, 255);
@@ -28,6 +28,9 @@ public class MazeGame extends JFrame {
     public static final Color T_MUD = new Color(254, 243, 199);
     public static final Color T_WATER = new Color(219, 234, 254);
 
+    // Warna Animasi Baru
+    public static final Color COLOR_SCAN = new Color(255, 223, 0, 150); // Kuning Transparan (Scanning)
+
     // Fonts
     public static final Font FONT_HEADER = new Font("-apple-system", Font.BOLD, 22);
     public static final Font FONT_LABEL = new Font("-apple-system", Font.BOLD, 12);
@@ -44,29 +47,27 @@ public class MazeGame extends JFrame {
     private boolean isMusicPlaying = true;
 
     public MazeGame() {
-        setTitle("Maze Ultimate: Data Structure Edition");
+        setTitle("Maze Ultimate: Algorithm Visualizer");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         getContentPane().setBackground(APP_BG);
 
-        // --- 1. MAZE AREA (CENTER) ---
+        // --- 1. MAZE AREA ---
         mazePanel = new MazePanel(20, 20);
-
         JPanel mazeContainer = new JPanel(new GridBagLayout());
         mazeContainer.setBackground(APP_BG);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 1.0; gbc.weighty = 1.0; gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(20, 20, 20, 20);
         mazeContainer.add(mazePanel, gbc);
-
         add(mazeContainer, BorderLayout.CENTER);
 
-        // --- 2. SIDEBAR (RIGHT) ---
+        // --- 2. SIDEBAR ---
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(SIDEBAR_BG);
         sidePanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, BORDER_COLOR));
-        sidePanel.setPreferredSize(new Dimension(320, 0)); // Agak lebar dikit buat teks
+        sidePanel.setPreferredSize(new Dimension(320, 0));
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -118,11 +119,11 @@ public class MazeGame extends JFrame {
         infoCard.setBorder(new EmptyBorder(10, 10, 10, 10));
         infoCard.add(algoDescriptionArea);
         infoCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoCard.setMaximumSize(new Dimension(300, 100)); // Sedikit lebih tinggi
+        infoCard.setMaximumSize(new Dimension(300, 100));
 
         // Buttons
         MacButton btnGenerate = new MacButton("Buat Terrain Baru", false);
-        MacButton btnSolve = new MacButton("Mulai Jalan", true);
+        MacButton btnSolve = new MacButton("Visualisasi Jalan", true);
 
         // Music
         JPanel audioSection = new JPanel(new BorderLayout());
@@ -142,7 +143,7 @@ public class MazeGame extends JFrame {
         audioSection.add(btnPlayPause, BorderLayout.WEST);
         audioSection.add(volSlider, BorderLayout.CENTER);
 
-        // Adding
+        // Add components
         content.add(lblTitle);
         content.add(Box.createVerticalStrut(25));
         content.add(gridHeader);
@@ -237,32 +238,19 @@ public class MazeGame extends JFrame {
         }
     }
 
-    // --- UPDATE: PENJELASAN DATA STRUKTUR (STACK/QUEUE) ---
     private void updateAlgoDescription() {
         String selected = (String) algoSelector.getSelectedItem();
         String desc = "";
 
         if (selected.contains("Dijkstra")) {
-            desc = "<b>DIJKSTRA</b><br>" +
-                    "Struktur Data: <b style='color:#007aff'>Priority Queue</b><br>" +
-                    "Menjamin <b>Biaya Terendah</b>. Ia memeriksa simpul dengan akumulasi biaya terkecil terlebih dahulu, menghindari rintangan berat secara optimal.";
+            desc = "<b>DIJKSTRA</b><br>Data: <b style='color:#007aff'>Priority Queue</b><br>Menjamin <b>Biaya Terendah</b>. Memeriksa simpul dengan akumulasi biaya terkecil terlebih dahulu.";
+        } else if (selected.contains("A*")) {
+            desc = "<b>A* (A-STAR)</b><br>Data: <b style='color:#007aff'>Priority Queue</b><br>Lebih cepat dari Dijkstra karena menggunakan <b>Heuristik</b> (tebakan jarak) untuk memprioritaskan arah.";
+        } else if (selected.contains("BFS")) {
+            desc = "<b>BFS</b><br>Data: <b style='color:#34c759'>Queue (FIFO)</b><br>Menyebar rata lapis demi lapis. Menjamin <b>Langkah Tersedikit</b> tapi mengabaikan berat medan.";
+        } else {
+            desc = "<b>DFS</b><br>Data: <b style='color:#ff3b30'>Stack (LIFO)</b><br>Menelusuri satu lorong sedalam mungkin. Jalur seringkali panjang dan tidak efisien.";
         }
-        else if (selected.contains("A*")) {
-            desc = "<b>A* (A-STAR)</b><br>" +
-                    "Struktur Data: <b style='color:#007aff'>Priority Queue</b><br>" +
-                    "Lebih cerdas dari Dijkstra karena menggunakan <b>Heuristik</b> (estimasi jarak ke finish) untuk memprioritaskan arah.";
-        }
-        else if (selected.contains("BFS")) {
-            desc = "<b>BFS (Breadth First Search)</b><br>" +
-                    "Struktur Data: <b style='color:#34c759'>Queue (Antrian FIFO)</b><br>" +
-                    "Menyebar ke segala arah lapis demi lapis. Menjamin <b>Langkah Tersedikit</b>, tapi buta terhadap berat medan (lumpur/air).";
-        }
-        else {
-            desc = "<b>DFS (Depth First Search)</b><br>" +
-                    "Struktur Data: <b style='color:#ff3b30'>Stack (Tumpukan LIFO)</b><br>" +
-                    "Menelusuri satu lorong sedalam mungkin sebelum mundur. Jalurnya sering acak, panjang, dan berputar-putar.";
-        }
-
         algoDescriptionArea.setText("<html><body style='font-family:-apple-system, sans-serif; font-size:10px; color:#666;'>" + desc + "</body></html>");
     }
 
@@ -313,7 +301,6 @@ class Cell implements Comparable<Cell> {
     @Override public int compareTo(Cell o){return Double.compare(this.fCost,o.fCost);}
 }
 
-// --- STATS WINDOW (CSS Style) ---
 class SolveStats {
     long timeTakenNano; int pathSteps,totalCost,nodesVisited; String algorithmName;
     public String getSummary(){
@@ -338,7 +325,14 @@ class SolveStats {
 // --- MAZE PANEL ---
 class MazePanel extends JPanel {
     private int rows, cols;
-    private Cell[][] grid; private Cell startCell, endCell; private List<Cell> currentPath = new ArrayList<>();
+    private Cell[][] grid; private Cell startCell, endCell;
+    private List<Cell> currentPath = new ArrayList<>();
+
+    // --- VARIABLES FOR SCANNING ANIMATION ---
+    private List<Cell> visitedOrder = new ArrayList<>(); // Menyimpan urutan scanning
+    private boolean isScanning = false; // Flag mode scanning
+    private int scanIndex = 0;
+
     private Timer animationTimer; private int animationIndex = 0; private Random rand = new Random(); private SolveStats lastStats;
 
     public MazePanel(int rows, int cols) {
@@ -352,7 +346,9 @@ class MazePanel extends JPanel {
 
     public void generateMaze() {
         grid = new Cell[rows][cols]; for(int r=0;r<rows;r++)for(int c=0;c<cols;c++) grid[r][c]=new Cell(r,c);
-        currentPath.clear(); if(animationTimer!=null) animationTimer.stop();
+        currentPath.clear(); visitedOrder.clear();
+        if(animationTimer!=null) animationTimer.stop();
+
         ArrayList<Cell> frontier = new ArrayList<>();
         Cell start=grid[0][0]; start.visited=true; addFrontier(start,frontier);
         while(!frontier.isEmpty()) {
@@ -373,11 +369,14 @@ class MazePanel extends JPanel {
     }
 
     public void solveMaze(String algoType) {
-        resetState(); currentPath.clear(); if(animationTimer!=null) animationTimer.stop();
+        resetState(); currentPath.clear(); visitedOrder.clear();
+        if(animationTimer!=null) animationTimer.stop();
+
         long startTime=System.nanoTime(); boolean found=false;
         if(algoType.startsWith("BFS")) found=runBFS(); else if(algoType.startsWith("DFS")) found=runDFS();
         else if(algoType.startsWith("Dijkstra")) found=runDijkstraOrAStar(false); else if(algoType.startsWith("A*")) found=runDijkstraOrAStar(true);
         long endTime=System.nanoTime();
+
         if(found) {
             reconstructPath(); int totalCost=0; for(Cell c:currentPath) totalCost+=c.terrain.cost;
             lastStats=new SolveStats(); lastStats.timeTakenNano=endTime-startTime; lastStats.pathSteps=currentPath.size(); lastStats.totalCost=totalCost; lastStats.nodesVisited=countVisited(); lastStats.algorithmName=algoType.split(" ")[0];
@@ -385,9 +384,57 @@ class MazePanel extends JPanel {
         } else JOptionPane.showMessageDialog(this,"Tidak ada jalan!", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private boolean runBFS(){Queue<Cell> q=new LinkedList<>();startCell.visited=true;q.add(startCell);while(!q.isEmpty()){Cell cur=q.poll();if(cur==endCell)return true;for(Cell n:getAccessibleNeighbors(cur)){if(!n.visited){n.visited=true;n.parent=cur;q.add(n);}}}return false;}
-    private boolean runDFS(){Stack<Cell> s=new Stack<>();startCell.visited=true;s.push(startCell);while(!s.isEmpty()){Cell cur=s.pop();if(cur==endCell)return true;List<Cell> n=getAccessibleNeighbors(cur);Collections.shuffle(n);for(Cell neighbor:n){if(!neighbor.visited){neighbor.visited=true;neighbor.parent=cur;s.push(neighbor);}}}return false;}
-    private boolean runDijkstraOrAStar(boolean isAStar){PriorityQueue<Cell> pq=new PriorityQueue<>();startCell.gCost=0;startCell.hCost=isAStar?heuristic(startCell,endCell):0;startCell.fCost=startCell.gCost+startCell.hCost;pq.add(startCell);while(!pq.isEmpty()){Cell cur=pq.poll();if(cur.visited)continue;cur.visited=true;if(cur==endCell)return true;for(Cell n:getAccessibleNeighbors(cur)){if(n.visited)continue;double newG=cur.gCost+n.terrain.cost;if(newG<n.gCost){n.gCost=newG;n.hCost=isAStar?heuristic(n,endCell):0;n.fCost=n.gCost+n.hCost;n.parent=cur;pq.remove(n);pq.add(n);}}}return false;}
+    // --- ALGORITHMS (UPDATED TO TRACK VISITED ORDER) ---
+    private boolean runBFS(){
+        Queue<Cell> q=new LinkedList<>();
+        startCell.visited=true; q.add(startCell); visitedOrder.add(startCell); // Track
+        while(!q.isEmpty()){
+            Cell cur=q.poll();
+            visitedOrder.add(cur); // Track order of processing
+            if(cur==endCell)return true;
+            for(Cell n:getAccessibleNeighbors(cur)){
+                if(!n.visited){n.visited=true;n.parent=cur;q.add(n);}
+            }
+        }
+        return false;
+    }
+
+    private boolean runDFS(){
+        Stack<Cell> s=new Stack<>();
+        startCell.visited=true; s.push(startCell); visitedOrder.add(startCell);
+        while(!s.isEmpty()){
+            Cell cur=s.pop();
+            visitedOrder.add(cur); // Track
+            if(cur==endCell)return true;
+            List<Cell> n=getAccessibleNeighbors(cur); Collections.shuffle(n);
+            for(Cell neighbor:n){
+                if(!neighbor.visited){neighbor.visited=true;neighbor.parent=cur;s.push(neighbor);}
+            }
+        }
+        return false;
+    }
+
+    private boolean runDijkstraOrAStar(boolean isAStar){
+        PriorityQueue<Cell> pq=new PriorityQueue<>();
+        startCell.gCost=0; startCell.hCost=isAStar?heuristic(startCell,endCell):0; startCell.fCost=startCell.gCost+startCell.hCost;
+        pq.add(startCell);
+        while(!pq.isEmpty()){
+            Cell cur=pq.poll();
+            if(cur.visited)continue;
+            cur.visited=true; visitedOrder.add(cur); // Track
+            if(cur==endCell)return true;
+            for(Cell n:getAccessibleNeighbors(cur)){
+                if(n.visited)continue;
+                double newG=cur.gCost+n.terrain.cost;
+                if(newG<n.gCost){
+                    n.gCost=newG; n.hCost=isAStar?heuristic(n,endCell):0; n.fCost=n.gCost+n.hCost; n.parent=cur;
+                    pq.remove(n); pq.add(n);
+                }
+            }
+        }
+        return false;
+    }
+
     private double heuristic(Cell a,Cell b){return Math.abs(a.r-b.r)+Math.abs(a.c-b.c);}
     private void addFrontier(Cell cell,ArrayList<Cell> frontier){int[] dr={-1,1,0,0},dc={0,0,-1,1};for(int i=0;i<4;i++){int nr=cell.r+dr[i],nc=cell.c+dc[i];if(isValid(nr,nc)&&!grid[nr][nc].visited&&!frontier.contains(grid[nr][nc]))frontier.add(grid[nr][nc]);}}
     private List<Cell> getVisitedNeighbors(Cell cell){List<Cell> n=new ArrayList<>();int[] dr={-1,1,0,0},dc={0,0,-1,1};for(int i=0;i<4;i++){int nr=cell.r+dr[i],nc=cell.c+dc[i];if(isValid(nr,nc)&&grid[nr][nc].visited)n.add(grid[nr][nc]);}return n;}
@@ -399,17 +446,34 @@ class MazePanel extends JPanel {
     private void resetState(){for(int r=0;r<rows;r++)for(int c=0;c<cols;c++){grid[r][c].visited=false;grid[r][c].parent=null;grid[r][c].gCost=Double.POSITIVE_INFINITY;grid[r][c].fCost=Double.POSITIVE_INFINITY;}}
     private boolean isValid(int r,int c){return r>=0&&r<rows&&c>=0&&c<cols;}
 
+    // --- ANIMATION CONTROLLER ---
     private void startAnimation(){
         animationIndex=0;
-        int delay=80;
-        animationTimer=new Timer(delay,e->{
-            if(animationIndex<currentPath.size()){
-                animationIndex++;
+        scanIndex = 0;
+        isScanning = true; // Start with scanning phase
+
+        int delay = 40; // Base speed
+        animationTimer=new Timer(delay, e->{
+
+            // PHASE 1: SCANNING ANIMATION
+            if (isScanning) {
+                // Percepat visualisasi scan agar tidak menunggu lama
+                int speedUp = 5; // Gambar 5 kotak per frame
+                scanIndex += speedUp;
+                if (scanIndex >= visitedOrder.size()) {
+                    isScanning = false; // Selesai scanning, lanjut ke snake
+                    scanIndex = visitedOrder.size();
+                }
                 repaint();
-            } else {
-                animationTimer.stop();
-                if(lastStats!=null) {
-                    JOptionPane.showMessageDialog(this, lastStats.getSummary(), "Hasil", JOptionPane.PLAIN_MESSAGE);
+            }
+            // PHASE 2: SNAKE ANIMATION
+            else {
+                if(animationIndex<currentPath.size()){
+                    animationIndex++;
+                    repaint();
+                } else {
+                    animationTimer.stop();
+                    if(lastStats!=null) JOptionPane.showMessageDialog(this, lastStats.getSummary(), "Hasil", JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });
@@ -421,21 +485,37 @@ class MazePanel extends JPanel {
         int w=getWidth(), h=getHeight(); if(w==0||h==0)return;
         float cellW=(float)w/cols, cellH=(float)h/rows, cs=Math.min(cellW,cellH);
         float offsetX=(w-(cols*cs))/2, offsetY=(h-(rows*cs))/2; g2.translate(offsetX,offsetY);
+
+        // 1. Draw Terrain
         for(int r=0;r<rows;r++)for(int c=0;c<cols;c++){
             int x=(int)(c*cs),y=(int)(r*cs),s=(int)Math.ceil(cs);
             if(grid[r][c].terrain==TerrainType.GRASS)g2.setColor(MazeGame.T_GRASS);else if(grid[r][c].terrain==TerrainType.MUD)g2.setColor(MazeGame.T_MUD);else if(grid[r][c].terrain==TerrainType.WATER)g2.setColor(MazeGame.T_WATER);else g2.setColor(MazeGame.T_DEFAULT);
             g2.fillRect(x,y,s,s);
         }
+
+        // 2. Draw Scanning Process (Kuning)
+        g2.setColor(MazeGame.COLOR_SCAN);
+        int limitScan = Math.min(scanIndex, visitedOrder.size());
+        for(int i=0; i<limitScan; i++) {
+            Cell c = visitedOrder.get(i);
+            int x=(int)(c.c*cs), y=(int)(c.r*cs), s=(int)Math.ceil(cs);
+            g2.fillRect(x, y, s, s);
+        }
+
+        // 3. Draw Walls
         g2.setColor(MazeGame.MAZE_WALL); g2.setStroke(new BasicStroke(Math.max(1.5f,cs/15)));
         for(int r=0;r<rows;r++)for(int c=0;c<cols;c++){
             int x=(int)(c*cs),y=(int)(r*cs),s=(int)cs;
             if(grid[r][c].walls[0])g2.drawLine(x,y,x+s,y);if(grid[r][c].walls[1])g2.drawLine(x+s,y,x+s,y+s);if(grid[r][c].walls[2])g2.drawLine(x,y+s,x+s,y+s);if(grid[r][c].walls[3])g2.drawLine(x,y,x,y+s);
         }
-        if(!currentPath.isEmpty()){
+
+        // 4. Draw Path (Snake) - Hanya jika scanning selesai (isScanning == false)
+        if(!isScanning && !currentPath.isEmpty()){
             g2.setColor(MazeGame.PRIMARY_BLUE); g2.setStroke(new BasicStroke(cs*0.4f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
             for(int i=1;i<animationIndex&&i<currentPath.size();i++){Cell p=currentPath.get(i-1),c=currentPath.get(i);g2.drawLine((int)(p.c*cs+cs/2),(int)(p.r*cs+cs/2),(int)(c.c*cs+cs/2),(int)(c.r*cs+cs/2));}
             if(animationIndex>0){Cell h2=currentPath.get(Math.min(animationIndex-1,currentPath.size()-1));int hx=(int)(h2.c*cs+cs/2),hy=(int)(h2.r*cs+cs/2),hs=(int)(cs*0.65);g2.setColor(new Color(0,64,221));g2.fillOval(hx-hs/2,hy-hs/2,hs,hs);}
         }
+
         drawMarker(g2,startCell,new Color(16,185,129),cs); drawMarker(g2,endCell,new Color(239,68,68),cs);
     }
     private void drawMarker(Graphics2D g2,Cell cell,Color c,float cs){if(cell==null)return;g2.setColor(c);int m=(int)(cs*0.2),s=(int)(cs-m*2);g2.fillRoundRect((int)(cell.c*cs+m),(int)(cell.r*cs+m),s,s,8,8);}
