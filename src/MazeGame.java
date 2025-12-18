@@ -293,6 +293,7 @@ public class MazeGame extends JFrame {
 }
 
 // --- DATA ---
+// HAMBATAN
 enum TerrainType { DEFAULT(0), GRASS(1), MUD(5), WATER(10); public final int cost; TerrainType(int cost){this.cost=cost;} }
 class Cell implements Comparable<Cell> {
     int r,c; boolean[] walls={true,true,true,true}; boolean visited=false; Cell parent=null;
@@ -348,7 +349,7 @@ class MazePanel extends JPanel {
         grid = new Cell[rows][cols]; for(int r=0;r<rows;r++)for(int c=0;c<cols;c++) grid[r][c]=new Cell(r,c);
         currentPath.clear(); visitedOrder.clear();
         if(animationTimer!=null) animationTimer.stop();
-
+        //LABIRIN
         ArrayList<Cell> frontier = new ArrayList<>();
         Cell start=grid[0][0]; start.visited=true; addFrontier(start,frontier);
         while(!frontier.isEmpty()) {
@@ -356,6 +357,7 @@ class MazePanel extends JPanel {
             List<Cell> vn=getVisitedNeighbors(current);
             if(!vn.isEmpty()) { Cell n=vn.get(rand.nextInt(vn.size())); removeWalls(current,n); current.visited=true; addFrontier(current,frontier); }
         }
+        //MULTI JALUR
         int wallsToRemove=(rows*cols)/8;
         for(int i=0;i<wallsToRemove;i++) { Cell c=grid[rand.nextInt(rows)][rand.nextInt(cols)]; List<Cell> wn=getWalledNeighbors(c); if(!wn.isEmpty()) removeWalls(c,wn.get(rand.nextInt(wn.size()))); }
         for(int r=0;r<rows;r++)for(int c=0;c<cols;c++) {
@@ -385,6 +387,7 @@ class MazePanel extends JPanel {
     }
 
     // --- ALGORITHMS (UPDATED TO TRACK VISITED ORDER) ---
+    //BFSS
     private boolean runBFS(){
         Queue<Cell> q=new LinkedList<>();
         startCell.visited=true; q.add(startCell); visitedOrder.add(startCell); // Track
@@ -398,7 +401,7 @@ class MazePanel extends JPanel {
         }
         return false;
     }
-
+    //DFSS
     private boolean runDFS(){
         Stack<Cell> s=new Stack<>();
         startCell.visited=true; s.push(startCell); visitedOrder.add(startCell);
